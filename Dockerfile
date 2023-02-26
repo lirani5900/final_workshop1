@@ -1,19 +1,28 @@
-FROM python:latest
+FROM python:3.9-slim-buster
 
-WORKDIR /opt/status-page/
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt ./
+# Create a non-root user for running the application
+RUN useradd -m -u 1000 -s /bin/bash statususer
+USER statususer
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file to the container and install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ~/final_workshop1/statuspage/manage.py /opt/status-page/
-COPY ~/final_workshop1/statuspage/statuspage/setting.py /opt/status-page/statuspage/
+# Copy the project files to the container
 COPY . .
 
-RUN #apt-get update && \
-    bash ./upgrade.sh && \
-    python -m venv /opt/status-page/venv && \
-    python /opt/status-page/statuspage/manage.py createsuperuser --no-input --username ub>
+# Collect static files
+RUN python manage.py collectstatic --noinput
 
-EXPOSE 8000 5432 6379
+# Expose port 8000 for the Django application
+EXPOSE 8000
 
-CMD ["python", "/opt/status-page/statuspage/manage.py", "runserver", "0.0.0.0:8000"]
+# Start the Django development server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
