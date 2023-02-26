@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM python:3
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -9,7 +9,10 @@ RUN useradd -m -u 1000 -s /bin/bash statususer
 USER statususer
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /opt/status-page
+
+# Install system dependencies for PostgreSQL
+RUN apt-get update && apt-get install -y libpq-dev
 
 # Copy the requirements file to the container and install dependencies
 COPY requirements.txt .
