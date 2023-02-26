@@ -1,28 +1,20 @@
 FROM python:3
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV STATUS_PAGE_CONFIGURATION statuspage.configuration
-
-# Create a non-root user for running the application
-RUN useradd -m -u 1000 -s /bin/bash statususer
-USER statususer
-
 # Set the working directory in the container
 WORKDIR /opt/status-page/
+
+# Copy the requirements file to the container and install dependencies
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the project files to the container
+COPY statuspage/manage.py /opt/status-page/
+COPY statuspage/settings.py /opt/status-page/
+COPY . .
 
 # Install system dependencies for PostgreSQL
 USER root
 RUN apt-get update && apt-get install -y libpq-dev
-
-# Copy the project files to the container
-COPY statuspage/manage.py /opt/status-page/
-COPY statuspage/setting.py /opt/status-page/
-COPY . .
-
-# Copy the requirements file to the container and install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
 
 # Collect static files
 RUN #apt-get update && \
@@ -34,4 +26,5 @@ RUN #apt-get update && \
 EXPOSE 8000 5432 6379
 
 # Start the Django development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000", "--insecure"]
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "statuspage.wsgi:application"]
