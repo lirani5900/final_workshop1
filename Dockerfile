@@ -11,8 +11,10 @@ USER statususer
 # Set the working directory in the container
 WORKDIR /opt/status-page
 
-# Install system dependencies for PostgreSQL
+# Update the package manager and install system dependencies for PostgreSQL
+USER root
 RUN apt-get update && apt-get install -y libpq-dev
+USER statususer
 
 # Copy the requirements file to the container and install dependencies
 COPY requirements.txt .
