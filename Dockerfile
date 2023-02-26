@@ -11,17 +11,14 @@ USER statususer
 # Set the working directory in the container
 WORKDIR /opt/status-page
 
-# Update the package manager and install system dependencies for PostgreSQL
-USER root
+# Install system dependencies for PostgreSQL
 RUN apt-get update && apt-get install -y libpq-dev
-USER statususer
-
-# Copy the requirements file to the container and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the project files to the container
 COPY . .
+
+# Copy the requirements file to the container and install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Collect static files
 RUN python manage.py collectstatic --noinput
