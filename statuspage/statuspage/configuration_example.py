@@ -6,12 +6,12 @@
 # write access to the server via any other hostnames. The first FQDN in the list will be treated as the preferred name.
 #
 # Example: ALLOWED_HOSTS = ['status-page.example.com', 'status-page.internal.local']
-ALLOWED_HOSTS = ['']
+ALLOWED_HOSTS = []
 
 # PostgreSQL database configuration. See the Django documentation for a complete list of available parameters:
 #   https://docs.djangoproject.com/en/stable/ref/settings/#databases
 DATABASE = {
-    'NAME': '',         # Database name
+    'NAME': 'status-page',         # Database name
     'USER': '',               # PostgreSQL username
     'PASSWORD': '',           # PostgreSQL password
     'HOST': 'localhost',      # Database server
@@ -24,7 +24,7 @@ DATABASE = {
 REDIS = {
     'tasks': {
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': 6379,
         # Comment out `HOST` and `PORT` lines and uncomment the following if using Redis Sentinel
         # 'SENTINELS': [('mysentinel.redis.example.com', 6379)],
         # 'SENTINEL_SERVICE': 'status-page',
@@ -37,7 +37,7 @@ REDIS = {
     },
     'caching': {
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': 6379,
         # Comment out `HOST` and `PORT` lines and uncomment the following if using Redis Sentinel
         # 'SENTINELS': [('mysentinel.redis.example.com', 6379)],
         # 'SENTINEL_SERVICE': 'netbox',
