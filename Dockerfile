@@ -21,4 +21,4 @@ RUN . /opt/status-page/venv/bin/activate
 EXPOSE 8000 5432 6379
 
 #RUN THE APP
-CMD ["python3", "./statuspage/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python3", "./statuspage/manage.py", "runserver", "0.0.0.0:8000", "--insecure"]
