@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        AWS_REGION = 'us-east-1'
+    }
     stages {
         stage('Install Docker') {
             steps {
@@ -8,14 +11,20 @@ pipeline {
         }
          stage('Build Docker Image') {
             steps {
-                sh 'sudo docker build -t my_image .'
+                sh 'sudo docker build -t my_image:$BUILD_NUMBER .'
             }
         }
         stage('Push Docker Image to ECR') {
             steps {
-                sh '$(aws ecr get-login --no-include-email --region us-east-1)'
-                sh 'docker tag my_image final-workshop:latest 420493635762.dkr.ecr.us-east-1.amazonaws.com/final-workshop:$BUILD_NUMBER'
-                sh 'docker push 420493635762.dkr.ecr.us-east-1.amazonaws.com/final-workshop:$BUILD_NUMBER'
+                withCredentials([[
+                    credentialsId: '420493635762',
+                    accessKeyVariable: 'AKIAWDZ27WCZBU5JD3MK',
+                    secretKeyVariable: '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'
+                ]]) {
+                    sh '$(aws ecr get-login --no-include-email --region $AWS_REGION)'
+                    sh 'docker tag my_image 420493635762.dkr.ecr.us-east-1.amazonaws.com/final-workshop:$BUILD_NUMBER'
+                    sh 'docker push 420493635762.dkr.ecr.us-east-1.amazonaws.com/final-workshop:$BUILD_NUMBER'
+                }
             }
         }
     }
