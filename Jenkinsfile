@@ -16,11 +16,7 @@ pipeline {
         }
         stage('Push Docker Image to ECR') {
             steps {
-                withCredentials([[
-                    credentialsId: '420493635762',
-                    accessKeyVariable: 'AKIAWDZ27WCZBU5JD3MK',
-                    secretKeyVariable: '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'
-                ]]) {
+{
                     sh '$(aws ecr get-login --no-include-email --region $AWS_REGION)'
                     sh 'docker tag my_image 420493635762.dkr.ecr.us-east-1.amazonaws.com/final-workshop:$BUILD_NUMBER'
                     sh 'docker push 420493635762.dkr.ecr.us-east-1.amazonaws.com/final-workshop:$BUILD_NUMBER'
