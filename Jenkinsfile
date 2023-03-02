@@ -1,9 +1,5 @@
 pipeline {
     agent any
-    environment {
-        AWS_ACCESS_KEY_ID = credentials('420493635762').AWS_ACCESS_KEY_ID
-        AWS_SECRET_ACCESS_KEY = credentials('420493635762').AWS_SECRET_ACCESS_KEY
-    }
     stages {
         stage('Install Docker') {
             steps {
