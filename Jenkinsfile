@@ -1,7 +1,9 @@
-pipeline {
     agent any
     environment {
         registry = "420493635762.dkr.ecr.us-east-1.amazonaws.com/final-workshop"
+    }
+    triggers {
+        githubPush()
     }
     stages {
         stage('test') {
