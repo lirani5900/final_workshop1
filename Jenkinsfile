@@ -11,7 +11,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                echo 'sudo docker build -t my_image .'
+                sh 'sudo docker build -t my_image .'
             }
         }
         stage('Push Docker Image to ECR') {
