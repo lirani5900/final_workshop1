@@ -1,0 +1,25 @@
+name: Build and Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: 420493635762.dkr.ecr.us-east-1.amazonaws.com/final-workshop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Build Docker Image
+        run: sudo docker build -t my_image .
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.REGISTRY }}
+      - name: Tag and Push Docker Image
+        run: |
+          docker tag my_image ${{ env.REGISTRY }}:${{ github.run_number }}
+          docker push ${{ env.REGISTRY }}:${{ github.run_number }}
