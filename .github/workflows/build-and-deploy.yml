@@ -7,6 +7,9 @@ on:
 
 env:
   REGISTRY: 420493635762.dkr.ecr.us-east-1.amazonaws.com/final-workshop
+  ECS_CLUSTER_NAME: FinalWorkShopECS
+  ECS_SERVICE_NAME: StatusPageContainer
+  CF_DISTRIBUTION_ID: E3MGXQC933ZEY6
 
 jobs:
   build-and-deploy:
@@ -15,11 +18,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Build Docker Image
-        run: sudo docker build -t my_image .
+        run: |
+          sudo docker build -t my_image .
+          sudo docker tag my_image:latest ${REGISTRY}:latest
       - name: Login to Amazon ECR
         run: |
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.REGISTRY }}
-      - name: Tag and Push Docker Image
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${REGISTRY}
+      - name: Push Docker Image to ECR
         run: |
-          docker tag my_image ${{ env.REGISTRY }}:${{ github.run_number }}
-          docker push ${{ env.REGISTRY }}:${{ github.run_number }}
+          docker push ${REGISTRY}:latest
+      - name: Update ECS Service
+        run: |
+          aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --force-new-deployment
+      - name: Invalidate CloudFront Distribution
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*"
