@@ -1,5 +1,3 @@
-name: Build and Deploy Docker Image
-
 on:
   push:
     branches:
@@ -32,7 +30,7 @@ jobs:
           aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*" > invalidation.json
       - name: Wait for Invalidation to Complete
         run: |
-          invalidation_id=$(cat invalidation.json | jq -r '.Invalidation.Id')
+          invalidation_id=$(aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*" | grep -oP '(?<="Id": ")[^"]+')
           aws cloudfront wait invalidation-completed --distribution-id ${CF_DISTRIBUTION_ID} --id ${invalidation_id}
       - name: Update ECS Service
         run: |
