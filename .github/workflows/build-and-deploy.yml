@@ -25,13 +25,6 @@ jobs:
       - name: Push Docker Image to ECR
         run: |
           sudo docker push ${REGISTRY}:latest
-      - name: Create CloudFront Invalidation
-        run: |
-          aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*" > invalidation.json
-      - name: Wait for Invalidation to Complete
-        run: |
-          invalidation_id=$(aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*" | grep -oP '(?<="Id": ")[^"]+')
-          aws cloudfront wait invalidation-completed --distribution-id ${CF_DISTRIBUTION_ID} --id ${invalidation_id}
       - name: Update ECS Service
         run: |
           aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --force-new-deployment
