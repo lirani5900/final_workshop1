@@ -27,6 +27,9 @@ jobs:
       - name: Push Docker Image to ECR
         run: |
           docker push ${REGISTRY}:latest
+      - name: Delay
+        run: |
+          sleep 60    
       - name: Update ECS Service
         run: |
           aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --force-new-deployment
