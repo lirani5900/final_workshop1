@@ -28,3 +28,6 @@ jobs:
       - name: Update ECS Service
         run: |
           aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --force-new-deployment
+      - name: Create CloudFront Invalidation
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*"    
