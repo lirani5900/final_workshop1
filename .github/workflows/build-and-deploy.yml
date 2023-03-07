@@ -19,8 +19,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Build Docker Image
         run: |
-          sudo docker build -t my_image .
-          sudo docker tag my_image:latest ${REGISTRY}:latest
+          docker build -t my_image .
+          docker tag my_image:latest ${REGISTRY}:latest
       - name: Login to Amazon ECR
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${REGISTRY}
@@ -32,7 +32,7 @@ jobs:
           aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*" > invalidation.json
       - name: Wait for Invalidation to Complete
         run: |
-          invalidation_id=$(aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*" | grep -oP '(?<="Id": ")[^"]+')
+          invalidation_id=$(cat invalidation.json | jq -r '.Invalidation.Id')
           aws cloudfront wait invalidation-completed --distribution-id ${CF_DISTRIBUTION_ID} --id ${invalidation_id}
       - name: Update ECS Service
         run: |
