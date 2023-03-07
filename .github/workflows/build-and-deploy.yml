@@ -27,15 +27,13 @@ jobs:
       - name: Push Docker Image to ECR
         run: |
           docker push ${REGISTRY}:latest
-      - name: Delay 1
+      - name: Create CloudFront Invalidation
         run: |
-          sleep 60    
+          aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*" > invalidation.json
+      - name: Wait for Invalidation to Complete
+        run: |
+          invalidation_id=$(jq -r '.Invalidation.Id' invalidation.json)
+          aws cloudfront wait invalidation-completed --distribution-id ${CF_DISTRIBUTION_ID} --id ${invalidation_id}
       - name: Update ECS Service
         run: |
           aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --force-new-deployment
-      - name: Delay 2
-        run: |
-          sleep 60    
-      - name: Invalidate CloudFront Distribution
-        run: |
-          aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --paths "/*"
